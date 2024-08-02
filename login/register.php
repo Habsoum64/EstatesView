@@ -1,3 +1,5 @@
+<?php include '../settings/session.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,6 +34,7 @@
             <!-- Gender field -->
             <div class="form-group">
                 <select name="gender" id="gender" class="form-control" required>
+                    <option value="" disabled selected>Select your gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
@@ -45,13 +48,16 @@
             <button type="submit" class="btn btn-primary">Register</button>
             <?php
             if (isset($_SESSION['error'])) {
-                echo '<p class="error">' . $_SESSION['error'] . '</p>';
+                echo '<p class="text-danger">' . $_SESSION['error'] . '</p>';
                 unset($_SESSION['error']);
             }
             ?>
         </form>
         <!-- Link to login page -->
         <p class="mt-3">Already have an account? <a href="login.php">Login here</a></p>
+
+        <!-- Link to home page -->
+        <p class="mt-3"><a href="../view/home.php">Return home</a></p>
     </main>
 
     <footer class="bg-dark text-light py-3 mt-5">
@@ -60,6 +66,7 @@
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- Include Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -69,40 +76,32 @@
         var username = document.getElementById('username').value.trim();
         var email = document.getElementById('email').value.trim();
         var password = document.getElementById('password').value.trim();
-        var age = document.getElementById('age').value.trim();
-        var gender = document.getElementById('gender').value.trim();
-        var dob = document.getElementById('dob').value.trim();
+        var gender = document.getElementById('gender').value;
 
-        // Check if any field is empty
-        if (username === '' || email === '' || password === '' || gender === '' || dob === '') {
+        if (username === '' || email === '' || password === '' || gender === null) {
             alert("Please fill in all fields.");
             return false;
         }
 
-        // Validate email format
         if (!validateEmail(email)) {
             alert("Invalid email format.");
             return false;
         }
 
-        // Validate password strength
         if (!validatePassword(password)) {
             alert("Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character.");
             return false;
         }
 
-        // If all validation passed, return true to submit the form
         return true;
     }
 
     function validateEmail(email) {
-        // Regular expression for validating email format
         var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
     }
 
     function validatePassword(password) {
-        // Regular expression for validating password strength
         var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return regex.test(password);
     }

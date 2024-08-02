@@ -16,26 +16,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dob = $_POST['dob'];
     $user_type = 'Admin';
 
-    // Evaluating the age from the dob
-    $today = new DateTime('today');
-    $age = $dob->diff($today)->y;
-
     // Initialize an array to store validation errors
     $errors = [];
 
     // Validate inputs
-    if (empty($username) || empty($email) || empty($password) || empty($age) || empty($gender) || empty($dob)) {
+    if (empty($username) || empty($email) || empty($password) || empty($gender) || empty($dob)) {
         $errors[] = "Please fill in all fields.";
     }
 
     // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Invalid email format.";
-    }
-
-    // Validate age
-    if (!is_numeric($age) || $age < 18) {
-        $errors[] = "Age must be a valid number and at least 18 years old.";
     }
 
     // Perform password strength validation using regex
@@ -49,12 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         // Insert user into database
-        $stmt = $conn->prepare("INSERT INTO Users (username, email, passwd, gender, date_of_birth) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $username, $email, $hashed_password, $gender, $dob);
+        $stmt = $conn->prepare("INSERT INTO users (username, email, passwd, gender, date_of_birth, user_type) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $username, $email, $hashed_password, $gender, $dob, $user_type);
 
         if ($stmt->execute()) {
             $_SESSION['success'] = "Registration successful. You can now log in.";
-            header("Location: login.php");
+            header("Location: ../login/login.php");
             exit();
         } else {
             $_SESSION['error'] = "Error occurred. Please try again later.";

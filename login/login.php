@@ -1,3 +1,7 @@
+<?php
+include '../settings/session.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,14 +28,18 @@
                 <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
             <button type="submit" class="btn btn-primary">Login</button>
+
             <?php
             if (isset($_SESSION['error'])) {
-                echo '<p class="error">' . $_SESSION['error'] . '</p>';
+                echo '<div class="alert alert-danger mt-3">' . htmlspecialchars($_SESSION['error']) . '</div>';
                 unset($_SESSION['error']);
             }
             ?>
         </form>
         <p class="mt-3">Don't have an account? <a href="register.php">Register here</a></p>
+
+        <!-- Link to home page -->
+        <p class="mt-3"><a href="../view/home.php">Return home</a></p>
     </main>
 
     <footer class="bg-dark text-light py-3 mt-5">
@@ -40,6 +48,7 @@
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- Include Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>

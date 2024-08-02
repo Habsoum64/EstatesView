@@ -1,56 +1,69 @@
 <?php
-// Include session.php
+// Include session.php and connection.php
 include '../settings/session.php';
-// Include connection.php
 include '../settings/connection.php';
 
-// Redirect to homepage if already logged-in
 redirect_if_logged_in();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data
-    $username = $_POST['username'];
-    $email = $_POST['email'];
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = $_POST['password'];
     $gender = $_POST['gender'];
-    $dob = $_POST['dob'];
     $user_type = 'Regular';
-
-    // Evaluating the age from the dob
-    $today = new DateTime('today');
-    $age = $dob->diff($today)->y;
 
     // Initialize an array to store validation errors
     $errors = [];
 
-    // Validate inputs
-    if (empty($username) || empty($email) || empty($password) || empty($age) || empty($gender) || empty($dob)) {
-        $errors[] = "Please fill in all fields.";
+    // Validate username
+    if (empty($username)) {
+        $errors[] = "Username is required.";
+    } else {
+        // Check if username already exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $errors[] = "Username already taken.";
+        }
+        $stmt->close();
     }
 
-    // Validate email format
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    // Validate email
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Invalid email format.";
+    } else {
+        // Check if email already exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $errors[] = "Email already registered.";
+        }
+        $stmt->close();
     }
 
-    // Validate age
-    if (!is_numeric($age) || $age < 18) {
-        $errors[] = "Age must be a valid number and at least 18 years old.";
-    }
-
-    // Perform password strength validation using regex
-    if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[a-zA-Z\d\W_]{8,}$/", $password)) {
+    // Validate password
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
         $errors[] = "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character.";
     }
 
-    // Check if there are any validation errors
-    if (empty($errors)) {
-        // Hash password
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    // Validate gender
+    if (empty($gender)) {
+        $errors[] = "Gender is required.";
+    }
 
-        // Insert user into database
-        $stmt = $conn->prepare("INSERT INTO Users (username, email, passwd, gender, date_of_birth) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $username, $email, $hashed_password, $gender, $dob);
+    // If there are no validation errors, proceed with registration
+    if (empty($errors)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("INSERT INTO users (username, email, passwd, gender, user_type) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $username, $email, $hashed_password, $gender, $user_type);
 
         if ($stmt->execute()) {
             $_SESSION['success'] = "Registration successful. You can now log in.";
@@ -58,13 +71,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         } else {
             $_SESSION['error'] = "Error occurred. Please try again later.";
-            header("Location: register.php");
-            exit();
         }
+        $stmt->close();
     } else {
-        // If there are validation errors, store them in the session and redirect back to register.php
-        $_SESSION['errors'] = $errors;
-        //header("Location: register.php");
-        exit();
+        $_SESSION['error'] = implode("<br>", $errors);
     }
+    header("Location: register.php");
+    exit();
 }

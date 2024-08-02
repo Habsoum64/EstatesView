@@ -3,14 +3,14 @@ session_start();
 
 function check_login() {
     if (!isset($_SESSION['user_id'])) {
-        header("Location: login.php");
+        header("Location: ../login/login.php");
         exit();
     }
 }
 
 function redirect_if_logged_in() {
     if (isset($_SESSION['user_id'])) {
-        header("Location: index.php");
+        header("Location: ../index.php");
         exit();
     }
 }

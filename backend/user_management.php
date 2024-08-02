@@ -1,13 +1,5 @@
 <?php
-include '../settings/session.php';
 include '../settings/connection.php'; // Include the database connection file
-
-// Check if the user is an admin
-if ($_SESSION['user_type'] !== 'admin') {
-    // Redirect to the user dashboard if the user is not an admin
-    header("Location: user_dashboard.php");
-    exit();
-}
 
 // Check if user management action is triggered
 if (isset($_GET['action']) && isset($_GET['user_id'])) {

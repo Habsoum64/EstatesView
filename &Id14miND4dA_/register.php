@@ -52,6 +52,9 @@
         </form>
         <!-- Link to login page -->
         <p class="mt-3">Already have an account? <a href="login.php">Login here</a></p>
+
+        <!-- Link to home page -->
+        <p class="mt-3"><a href="../view/home.php">Return home</a></p>
     </main>
 
     <footer class="bg-dark text-light py-3 mt-5">
@@ -69,7 +72,6 @@
         var username = document.getElementById('username').value.trim();
         var email = document.getElementById('email').value.trim();
         var password = document.getElementById('password').value.trim();
-        var age = document.getElementById('age').value.trim();
         var gender = document.getElementById('gender').value.trim();
         var dob = document.getElementById('dob').value.trim();
 
@@ -103,7 +105,7 @@
 
     function validatePassword(password) {
         // Regular expression for validating password strength
-        var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[a-zA-Z\d\W_]{8,}$/;
         return regex.test(password);
     }
     </script>

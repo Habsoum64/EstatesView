@@ -3,6 +3,11 @@
 include '../settings/session.php';
 include '../settings/connection.php';
 
+$user_id = null;
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+};
+
 // Fetch property details from the database based on the listing ID
 if (isset($_GET['listing_id'])) {
     $listing_id = $_GET['listing_id'];
@@ -112,48 +117,7 @@ if (isset($_GET['listing_id'])) {
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="home.php">Estates View</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="home.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.php">About</a>
-                    </li>
-
-                    <!-- Conditional behavior based on user status -->
-                    <?php if (isset($_SESSION['user_id'])) { // If user is logged in ?>
-                        <?php if ($_SESSION['user_type'] == 'admin') { // If user is an admin ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="admin_dashboard.php">Admin Dashboard</a>
-                            </li>
-                        <?php } else { // If user is not an admin ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="user_dashboard.php">User Dashboard</a>
-                            </li>
-                        <?php } ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../login/logout.php">Logout</a>
-                        </li>
-                    <?php } else { // If user is not logged in ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../login/login.php">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../login/register.php">Register</a>
-                        </li>
-                    <?php } ?>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include 'navbar.php' ?>
 
     <div class="container mt-4">
         <h1 class="text-center text-primary">Property Details</h1>
@@ -164,6 +128,7 @@ if (isset($_GET['listing_id'])) {
                 <p><strong>Location:</strong> <?php echo $property['location']; ?></p>
                 <p><strong>Price:</strong> $<?php echo $property['price']; ?></p>
                 <p><strong>Description:</strong> <?php echo $property['description']; ?></p>
+                <button type="button" class="btn btn-success" onclick="addToFavorites()">Add to favorites</button>
             </div>
             <div class="col-md-6">
                 <!-- Slideshow for listing images -->
@@ -193,16 +158,16 @@ if (isset($_GET['listing_id'])) {
 
         <!-- Back to Listings Button -->
         <div class="text-center mt-4">
-            <a href="user_dashboard.php" class="btn btn-secondary">Back to Listings</a>
+            <a href="main.php" class="btn btn-secondary">Back to Listings</a>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- Include JavaScript for slideshow functionality -->
     <script>
+        // Slideshow logic
         var slideIndex = 1;
         showSlides(slideIndex);
 
@@ -228,6 +193,29 @@ if (isset($_GET['listing_id'])) {
             }
             slides[slideIndex - 1].style.display = "block";
             dots[slideIndex - 1].className += " active";
+        }
+
+        function addToFavorites() {
+            $.ajax({
+                url: "../backend/add_favorite.php",
+                method: "POST",
+                data: {
+                    user_id: '<?php echo $user_id; ?>',
+                    listing_id: '<?php echo $listing_id; ?>'
+                },
+                success: function(response) {
+                    if (response.trim() == 'success') {
+                        console.log("Successfully added to favorites!");
+                        alert("Added to favorites!");
+                    } else {
+                        console.log("Error: Unable to add to favorites");
+                        alert("Unable to add to favorites.");
+                    }
+                },
+                error: function() {
+                    console.log("AJAX request failed.");
+                }
+            });
         }
     </script>
 </body>
