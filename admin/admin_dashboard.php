@@ -106,7 +106,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                         <td><?php echo $user['user_type']; ?></td>
                         <td>
                             <!-- Provide options for managing user accounts -->
-                            <a href="admin_dashboard.php?action=delete&user_id=<?php echo $user['user_id']; ?>" class="btn btn-danger">Delete</a>
+                            <a onclick="deleteUser(<?php echo $user['user_id']; ?>)" class="btn btn-danger">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -135,10 +135,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: 'Yes, ' + status_change,
-                cancelButtonText: 'Cancel',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // User clicked 'Yes'
@@ -153,9 +150,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                             if (response.trim() === 'success') {
                                 Swal.fire({
                                     title: "Status changed!",
-                                    icon: "success",
-                                    confirmButtonClass: "btn btn-success",
-                                    buttonsStyling: false
+                                    icon: "success"
                                 }).then(() => {
                                     location.reload(); // Reload page to update the listing status
                                 });
@@ -164,8 +159,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                                     title: "Error",
                                     text: "Unable to change status.",
                                     icon: "error",
-                                    confirmButtonClass: "btn btn-danger",
-                                    buttonsStyling: false
+                                    confirmButtonClass: "btn btn-danger"
                                 });
                             }
                         },
@@ -174,9 +168,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                             Swal.fire({
                                 title: "Error",
                                 text: "Failed to update the listing's status.",
-                                icon: "error",
-                                confirmButtonClass: "btn btn-danger",
-                                buttonsStyling: false
+                                icon: "error"
                             });
                         }
                     });
@@ -191,10 +183,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                confirmButtonClass: 'btn btn-danger',
-                cancelButtonClass: 'btn btn-secondary',
-                buttonsStyling: false
+                cancelButtonText: 'No, cancel!'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -207,8 +196,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                                     title: 'Deleted!',
                                     text: 'User account has been deleted.',
                                     icon: 'success',
-                                    confirmButtonClass: 'btn btn-success',
-                                    buttonsStyling: false
+                                    confirmButtonClass: 'btn btn-success'
                                 }).then(function() {
                                     location.reload(); // Reload page to reflect changes
                                 });
@@ -216,9 +204,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                                 Swal.fire({
                                     title: 'Error',
                                     text: 'Could not delete user account. Please try again later.',
-                                    icon: 'error',
-                                    confirmButtonClass: 'btn btn-danger',
-                                    buttonsStyling: false
+                                    icon: 'error'
                                 });
                             }
                         },
@@ -227,9 +213,7 @@ if ($_SESSION['user_type'] !== 'Admin') {
                             Swal.fire({
                                 title: 'Error',
                                 text: 'Failed to delete user account. Please try again later.',
-                                icon: 'error',
-                                confirmButtonClass: 'btn btn-danger',
-                                buttonsStyling: false
+                                icon: 'error'
                             });
                         }
                     });
